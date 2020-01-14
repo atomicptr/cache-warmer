@@ -10,17 +10,24 @@ import (
 )
 
 type Config struct {
-	Type              string
+	Provider          string
 	Path              string
+	PrefixUrl         string
 	Cookies           []string
 	Headers           []string
 	HttpClientTimeout time.Duration
+	NumberOfWorkers   int
+
+	cookieMap map[string]string
+	headerMap map[string]string
 }
 
 // Checks if the configuration is valid, returns error if invalid.
 func (c *Config) Validate() error {
-	if c.Type != "list" && c.Type != "sitemap" {
-		return errors.New("type is invalid, should be either 'list' or 'sitemap'")
+	if !urlProviderExists(c.Provider) {
+		return errors.New(fmt.Sprintf(
+			"provider is invalid, should be one of the following: %s",
+			strings.Join(urlProviderKeys(), ", ")))
 	}
 
 	// if it doesn't start with http it's probably a file path, check if that file exists...
@@ -29,6 +36,10 @@ func (c *Config) Validate() error {
 		if os.IsNotExist(err) {
 			return errors.New(fmt.Sprintf("file %s does not exist", c.Path))
 		}
+	}
+
+	if c.PrefixUrl != "" && !strings.HasPrefix(c.PrefixUrl, "http") {
+		return errors.New(fmt.Sprintf("prefix url is not a proper url: %s", c.PrefixUrl))
 	}
 
 	err := validateKeyValueSet("cookie", c.Cookies)
@@ -46,7 +57,7 @@ func (c *Config) Validate() error {
 
 func validateKeyValueSet(name string, keyValueSet []string) error {
 	for _, keyValuePair := range keyValueSet {
-		if matched, _ := regexp.MatchString(`.*=.*`, keyValuePair); !matched {
+		if matched, _ := regexp.MatchString(`.+=.+`, keyValuePair); !matched {
 			return errors.New(fmt.Sprintf(
 				"%s does not match pattern %s_name=%s_value for: %s",
 				name,
@@ -56,4 +67,28 @@ func validateKeyValueSet(name string, keyValueSet []string) error {
 			))
 		}
 	}
+	return nil
+}
+
+func (c *Config) HeaderMap() map[string]string {
+	if c.headerMap == nil {
+		c.headerMap = createMapFromKeyValueStrings(c.Headers)
+	}
+	return c.headerMap
+}
+
+func (c *Config) CookieMap() map[string]string {
+	if c.cookieMap == nil {
+		c.cookieMap = createMapFromKeyValueStrings(c.Cookies)
+	}
+	return c.cookieMap
+}
+
+func createMapFromKeyValueStrings(kvStrings []string) map[string]string {
+	newMap := make(map[string]string)
+	for _, kv := range kvStrings {
+		parts := strings.Split(kv, "=")
+		newMap[parts[0]] = parts[1]
+	}
+	return newMap
 }

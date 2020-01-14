@@ -1,5 +1,7 @@
 github.com/ardanlabs/conf v1.2.0 h1:2IntiqlEhRk+sYUbc8QAAZdZlpBWIzNoqILQvV6Jofo=
 github.com/ardanlabs/conf v1.2.0/go.mod h1:ILsMo9dMqYzCxDjDXTiwMI0IgxOJd0MOiucbQY2wlJw=
+github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
+github.com/beevik/etree v1.1.0/go.mod h1:r8Aw8JqVegEf0w2fDnATrX9VpkMcyFeM0FhwO62wh+A=
 github.com/google/go-cmp v0.3.1 h1:Xye71clBPdm5HgqGwUkwhbynsUJZhDbS20FvLhQ2izg=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/pkg/errors v0.9.0 h1:J8lpUdobwIeCI7OiSxHqEwJUKvJwicL5+3v1oe2Yb4k=

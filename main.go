@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/atomicptr/cache-warmer/cachewarmer"
+	_ "github.com/atomicptr/cache-warmer/urlproviders"
 )
 
 const ConfNamespace = "CW"
@@ -30,11 +31,13 @@ func run() error {
 	// configuration
 
 	var config struct {
-		Type              string        `conf:"required",help:"How should the tool query requests? Provide either 'list' or 'sitemap'"`
-		Path              string        `conf:"required",help:"Path to the URL list or Path/URL to the sitemap.xml"`
-		Cookies           []string      `help:"Cookies to add to the request"`
-		Headers           []string      `help:"Headers to add to the request"`
-		HttpClientTimeout time.Duration `default:"30s"`
+		Provider          string        `conf:"required,help:How should the tool query requests? Provide either 'list' or 'sitemap'"`
+		Path              string        `conf:"required,help:Path to the URL list or Path/URL to the sitemap.xml"`
+		Cookies           []string      `conf:"help:Cookies to add to the request"`
+		Headers           []string      `conf:"help:Headers to add to the request"`
+		PrefixUrl         string        `conf:"help:Prefix an URL or replace the URL altogether"`
+		HttpClientTimeout time.Duration `conf:"default:30s"`
+		NumberOfWorkers   int           `conf:"default:32"`
 	}
 
 	if err := conf.Parse(os.Args[1:], ConfNamespace, &config); err != nil {
@@ -67,12 +70,15 @@ func run() error {
 	// init cache warmer
 	cacheWarmer, err := cachewarmer.New(
 		cachewarmer.Config{
-			Type:              config.Type,
+			Provider:          config.Provider,
 			Path:              config.Path,
 			Cookies:           config.Cookies,
 			Headers:           config.Headers,
+			PrefixUrl:         config.PrefixUrl,
 			HttpClientTimeout: config.HttpClientTimeout,
+			NumberOfWorkers:   config.NumberOfWorkers,
 		},
+		logger,
 	)
 
 	if err != nil {
@@ -91,9 +97,6 @@ func run() error {
 		return errors.Wrap(err, "cache warmer error")
 	case sig := <-shutdown:
 		logger.Printf("main: %v shutdown...", sig)
-
-		cacheWarmer.Stop()
-
 		switch {
 		case sig == syscall.SIGSTOP:
 			return errors.New("integrity issue caused shutdown")
