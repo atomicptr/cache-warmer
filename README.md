@@ -35,9 +35,10 @@ OPTIONS
 ## Basic usage with Docker
 
 ```bash
-$ docker run atomicptr/cache-warmer --rm \
+$ docker run --rm \
     -e CW_PROVIDER=sitemap \
-    -e CW_PATH="https://example.com/sitemap.xml"
+    -e CW_PATH="https://example.com/sitemap.xml" \
+    atomicptr/cache-warmer
 ```
 
 ## Basic usage with executable
