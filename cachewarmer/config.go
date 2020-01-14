@@ -62,7 +62,7 @@ func validateKeyValueSet(name string, keyValueSet []string) error {
 	}
 
 	for _, keyValuePair := range keyValueSet {
-		if regex.MatchString(keyValuePair) {
+		if !regex.MatchString(keyValuePair) {
 			return fmt.Errorf(
 				"%s does not match pattern %s_name=%s_value for: %s",
 				name,
