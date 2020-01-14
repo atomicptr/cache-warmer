@@ -1,7 +1,6 @@
 package cachewarmer
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -38,5 +37,5 @@ func getUrlProviderByName(name string) (UrlProvider, error) {
 		return provider, nil
 	}
 
-	return nil, errors.New(fmt.Sprintf("unknown url provider %s", name))
+	return nil, fmt.Errorf("unknown url provider %s", name)
 }

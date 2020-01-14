@@ -31,7 +31,7 @@ func run() error {
 	// configuration
 
 	var config struct {
-		Provider          string        `conf:"required,help:How should the tool query requests? Provide either 'list' or 'sitemap'"`
+		Provider          string        `conf:"required,help:How should the tool query requests?"`
 		Path              string        `conf:"required,help:Path to the URL list or Path/URL to the sitemap.xml"`
 		Cookies           []string      `conf:"help:Cookies to add to the request"`
 		Headers           []string      `conf:"help:Headers to add to the request"`

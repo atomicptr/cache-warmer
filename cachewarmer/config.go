@@ -1,7 +1,6 @@
 package cachewarmer
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -25,21 +24,22 @@ type Config struct {
 // Checks if the configuration is valid, returns error if invalid.
 func (c *Config) Validate() error {
 	if !urlProviderExists(c.Provider) {
-		return errors.New(fmt.Sprintf(
+		return fmt.Errorf(
 			"provider is invalid, should be one of the following: %s",
-			strings.Join(urlProviderKeys(), ", ")))
+			strings.Join(urlProviderKeys(), ", "),
+		)
 	}
 
 	// if it doesn't start with http it's probably a file path, check if that file exists...
 	if !strings.HasPrefix(c.Path, "http") {
 		_, err := os.Stat(c.Path)
 		if os.IsNotExist(err) {
-			return errors.New(fmt.Sprintf("file %s does not exist", c.Path))
+			return fmt.Errorf("file %s does not exist", c.Path)
 		}
 	}
 
 	if c.PrefixUrl != "" && !strings.HasPrefix(c.PrefixUrl, "http") {
-		return errors.New(fmt.Sprintf("prefix url is not a proper url: %s", c.PrefixUrl))
+		return fmt.Errorf("prefix url is not a proper url: %s", c.PrefixUrl)
 	}
 
 	err := validateKeyValueSet("cookie", c.Cookies)
@@ -56,15 +56,20 @@ func (c *Config) Validate() error {
 }
 
 func validateKeyValueSet(name string, keyValueSet []string) error {
+	regex, err := regexp.Compile(`.+=.+`)
+	if err != nil {
+		return err
+	}
+
 	for _, keyValuePair := range keyValueSet {
-		if matched, _ := regexp.MatchString(`.+=.+`, keyValuePair); !matched {
-			return errors.New(fmt.Sprintf(
+		if regex.MatchString(keyValuePair) {
+			return fmt.Errorf(
 				"%s does not match pattern %s_name=%s_value for: %s",
 				name,
 				name,
 				name,
 				keyValuePair,
-			))
+			)
 		}
 	}
 	return nil
