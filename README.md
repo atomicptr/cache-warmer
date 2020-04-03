@@ -1,3 +1,16 @@
+# Discontinued use [github.com/atomicptr/crab](https://github.com/atomicptr/crab) instead
+
+Since I started using this tool for much more than cache warming (e.g. testing if urls are still working),
+I've decided to discontinue this tool in favor of a new one called [crab](https://github.com/atomicptr/crab).
+
+Crab has every feature this one has and more.
+
+## Basic Usage with Docker
+
+```bash
+$ docker run --rm atomicptr/crab crawl:sitemap https://domain.com/sitemap.xml
+```
+
 # cache-warmer
 
 Simple cache warmer which reads a sitemap.xml and requests all URLs within it.

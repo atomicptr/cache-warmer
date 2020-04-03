@@ -53,6 +53,9 @@ func run() error {
 		return errors.Wrap(err, "error: parsing config")
 	}
 
+	// note about being discontinued
+	logger.Printf("!!! DISCONTINUED USE https://github.com/atomicptr/crab instead.")
+
 	// app starting
 	logger.Printf("main: cache-warmer starting...")
 	defer logger.Printf("main: Done")
